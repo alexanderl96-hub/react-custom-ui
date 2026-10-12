@@ -1,0 +1,6 @@
+{
+  "language": "javascript",
+  "minCoverage": 75,
+  "requireAllTestsPass": true,
+  "maxHighVulnerabilities": 0
+}

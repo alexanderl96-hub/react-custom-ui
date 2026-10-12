@@ -1,24 +1,28 @@
-# React Custom UI
+# React UI Kit
 
-A dependency-light React component library for authentication screens, loading states, feedback, navigation and common UI primitives. Built with React and plain CSS.
+A reusable, GitHub-ready React component library for authentication, loading, error, and shared UI patterns. It is a component kit—not a backend-connected app. Components do not assume a router, auth provider, database, or API; provide callbacks to connect them to your application.
 
 ## Features
 
-- **8 authentication layouts** using the same `Login`, `SignUp` and `ForgotPassword` components: `split` (default), `minimal`, `glass`, `gradient`, `aurora`, `editorial`, `terminal`, `centered`.
-- **6 loading-screen layouts**: `classic` (default), `minimal`, `gradient`, `glass`, `terminal`, `orbit`.
-- Shared inputs and submit handlers; layouts change presentation, not authentication logic.
-- Buttons, cards, modal, toast notifications, alerts, empty states, nav components, loaders and skeletons.
-- Light/dark theme provider and toggle.
-- Responsive styles and reduced-motion support for the orbit loader.
+- **Authentication:** login, sign up, forgot password, reset password, and verify email pages.
+- **Eight auth layouts:** Minimal, Split, Glass, Gradient, Aurora, Editorial, Terminal, and Centered Card.
+- **Seven loading styles:** Classic, Minimal, Gradient, Glass, Terminal, Orbit, and Pulse, with shared progress behavior in the interactive example.
+- **Error page:** configurable code, title, message, and action.
+- **Shared controls:** Input, Button, and Notice.
+- **Hooks and themes:** `useTheme`, `useLoadingProgress`, `defaultTheme`, and `darkTheme`.
+- Responsive styling and a demo that lets you switch auth layouts and theme.
+- **Combined showcase:** a dedicated “Login + Loading” tab displays both components side by side, with independent layout selectors and a loading restart control.
 
-## Run the demo
+## Quick start: run the demo
+
+Requires Node.js 18+.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Use the selector at the top of the demo to preview every authentication layout. Choose **Preview loading screens** to explore the loading variants. Demo submissions are simulated and do not call a backend.
+Open the local URL Vite prints (usually `http://localhost:5173`). The demo opens on a **Login + Loading** showcase so both screens are visible together. Use the top-level tabs to preview each page independently, switch between all eight authentication layouts, toggle light/dark mode, and open the interactive loading and error demos. In the combined view, choose a loading style and restart its five-second preview without leaving the login example.
 
 ## Build
 
@@ -26,59 +30,80 @@ Use the selector at the top of the demo to preview every authentication layout. 
 npm run build
 ```
 
-## Use in your React application
+The first build creates the demo in `demo-dist/`; the library build creates distributable files in `dist/`.
 
-After publishing the package to npm or installing it from your Git repository, import the component and the library CSS (the build bundles the CSS entry):
+## Use in your React app
 
 ```jsx
-import { AuthLayout, Login } from "react-custom-ui";
-import "react-custom-ui/dist/index.css";
+import { LoginPage } from 'react-ui-kit';
+import 'react-ui-kit/style.css';
 
-export default function SignInPage() {
+export default function LoginRoute() {
   async function handleLogin({ email, password, remember }) {
-    // Call your own backend here. Keep secrets and auth tokens out of the UI library.
-    console.log({ email, password, remember });
+    // Call your own API/authentication provider here.
+    await myAuthService.signIn({ email, password, remember });
   }
 
   return (
-    <AuthLayout
-      layout="aurora"
-      brand="Acme"
-      tagline="Your workspace, all in one place."
-      footer="© Acme"
-    >
-      <Login onSubmit={handleLogin} onForgotPassword={() => console.log("Forgot password")} />
-    </AuthLayout>
+    <LoginPage
+      layout="split"
+      onSubmit={handleLogin}
+      onForgotPassword={() => navigate('/forgot-password')}
+      onSignUp={() => navigate('/sign-up')}
+    />
   );
 }
 ```
 
-### Change the look, not the behavior
+`layout` options: `minimal`, `split`, `glass`, `gradient`, `aurora`, `editorial`, `terminal`, `centered`.
+
+Other exported pages: `SignUpPage`, `ForgotPasswordPage`, `ResetPasswordPage`, `VerifyEmailPage`, `LoadingPage`, and `ErrorPage`. Pages accept callback props such as `onSubmit`, `onResend`, `onBack`, and `onAction` so the consuming application owns navigation and authentication.
+
+## Loading page
 
 ```jsx
-<AuthLayout layout="glass" brand="Acme">
-  <Login onSubmit={handleLogin} />
-</AuthLayout>
+import { LoadingPage } from 'react-ui-kit';
+
+<LoadingPage
+  layout="gradient"
+  duration={5000}
+  title="Preparing your workspace"
+  onComplete={() => console.log('Ready')}
+/>
 ```
 
-Supported auth layouts: `split`, `minimal`, `glass`, `gradient`, `aurora`, `editorial`, `terminal`, `centered`.
+## Project structure
 
-Supported loading layouts: `classic`, `minimal`, `gradient`, `glass`, `terminal`, `orbit`.
-
-```jsx
-<LoadingScreen layout="orbit" title="Preparing your workspace" subtitle="This will only take a moment." progress={72} />
+```text
+react-ui-kit/
+├── src/
+│   ├── components/
+│   │   ├── LoginPage/
+│   │   ├── LoadingPage/
+│   │   ├── ErrorPage/
+│   │   └── shared/
+│   ├── layouts/
+│   │   ├── MinimalLayout/
+│   │   ├── SplitLayout/
+│   │   ├── GlassLayout/
+│   │   ├── GradientLayout/
+│   │   └── layouts.jsx
+│   ├── hooks/
+│   ├── themes/
+│   └── index.js
+├── examples/
+├── README.md
+├── package.json
+└── LICENSE
 ```
 
-## Authentication responsibilities
+## Important notes
 
-This package provides presentation and form callbacks only. The consuming app must implement API requests, password recovery, email verification, validation rules beyond browser-required fields, authorization, session persistence, and security protections.
+- No real authentication, email delivery, OAuth, or API requests are included. Connect the supplied callbacks to your own services.
+- The Google button is a placeholder example; wire it to an OAuth provider before production.
+- The demo login logs only a redacted payload to the console and does not authenticate a user.
+- Customize CSS in `src/themes/ui-kit.css` and the existing loading demo styles in `src/styles.css`.
 
-## GitHub setup
+## License
 
-1. Create a repository named `react-custom-ui`.
-2. Unzip this project and push the contents to that repository.
-3. Update the placeholder GitHub URL in `package.json` to your repository URL.
-4. Run `npm install`, `npm run build`, and `npm run lint`.
-5. Tag releases (for example, `v0.3.0`) after testing.
-
-MIT licensed.
+MIT. See `LICENSE`.
